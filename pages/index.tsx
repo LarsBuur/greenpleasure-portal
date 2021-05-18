@@ -1,13 +1,9 @@
 import Link from 'next/link'
 import Layout from '../components/Layout'
-
 import { useAuth0 } from '../utils/auth0-spa'
 
-
 const IndexPage = () => {
-
-  const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0()
-
+  const { isAuthenticated, loginWithRedirect, logout, user, loading } = useAuth0()
 
   return (
     <Layout title="Home | Next.js + TypeScript Example">
@@ -18,25 +14,22 @@ const IndexPage = () => {
         </Link>
       </p>
 
-<div>
+      <div>
         {!isAuthenticated && (
           <button onClick={() => loginWithRedirect({})}>Log in</button>
         )}
 
-        {isAuthenticated && (
+        {isAuthenticated && user && (
           <div>
             <p>{user && user.nickname}</p>
-            <textarea>{JSON.stringify(user)}</textarea>
+            <textarea defaultValue={JSON.stringify(user)}></textarea>
+            <img src={user && user.picture} />
             <button onClick={() => logout()}>Log out</button>
           </div>
         )}
-</div>
-
-
+      </div>
     </Layout>
   )
-
 }
-
 
 export default IndexPage

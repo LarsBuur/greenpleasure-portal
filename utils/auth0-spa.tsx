@@ -34,11 +34,11 @@ export const Auth0Context = React.createContext<Auth0ContextProps>({
     isAuthenticated: false, user: {}, loading: false, popupOpen: false, 
     loginWithPopup: ()=>{}, 
     handleRedirectCallback: ()=>{},
-    getIdTokenClaims: () => { },
-    loginWithRedirect: () => { },
-    getTokenSilently: () => { },
-    getTokenWithPopup: () => { },
-    logout: () => { },
+    getIdTokenClaims: () => {},
+    loginWithRedirect: () => {},
+    getTokenSilently: () => {},
+    getTokenWithPopup: () => {},
+    logout: () => {},
 })
 export const useAuth0 = () => React.useContext(Auth0Context)
 
@@ -51,17 +51,22 @@ export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
 }) => {
     console.log(`domain: ${domain} clientId: ${clientId} redirectUri: ${redirectUri}`)
     const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false)
-    const [user, setUser] = React.useState<Partial<User>>({name: 'not logged in'})
+    const [user, setUser] = React.useState<Partial<User>>({})
     const [auth0Client, setAuth0] = React.useState<Auth0Client | null>(null)
     const [loading, setLoading] = React.useState(true)
     const [popupOpen, setPopupOpen] = React.useState(false)
 
     React.useEffect(() => {
+
+        console.log('use effect from auth0-spa')
+
+
         const initAuth0 = async () => {
             const auth0FromHook = await createAuth0Client({
                 domain,
                 client_id: clientId,
-                redirect_uri: redirectUri
+                redirect_uri: redirectUri,
+                
             })
 
             if (auth0FromHook) {
@@ -84,11 +89,8 @@ export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
                     if (user) {
                         setUser(user)
                     }
-
                 }
-
             }
-
             setLoading(false)
         }
 
@@ -133,6 +135,9 @@ export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
         }
     }
 
+    const hostUrl = process.env.NEXT_PUBLIC_HOST_URL;
+
+
     return (
         <Auth0Context.Provider
             value={{
@@ -142,11 +147,11 @@ export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
                 popupOpen,
                 loginWithPopup,
                 handleRedirectCallback,
-                getIdTokenClaims: (...p) => auth0Client ? auth0Client.getIdTokenClaims(...p) : () => { },
-                loginWithRedirect: (...p) => auth0Client ? auth0Client.loginWithRedirect(...p) : () => { },
-                getTokenSilently: (...p) => auth0Client ? auth0Client.getTokenSilently(...p) : () => { },
-                getTokenWithPopup: (...p) => auth0Client ? auth0Client.getTokenWithPopup(...p) : () => { },
-                logout: (...p) => auth0Client ? auth0Client.logout(...p) : () => { }
+                getIdTokenClaims: (...p) => auth0Client ? auth0Client.getIdTokenClaims(...p) : () => {},
+                loginWithRedirect: (...p) => auth0Client ? auth0Client.loginWithRedirect(...p) : () => {},
+                getTokenSilently: (...p) => auth0Client ? auth0Client.getTokenSilently(...p) : () => {},
+                getTokenWithPopup: (...p) => auth0Client ? auth0Client.getTokenWithPopup(...p) : () => {},
+                logout: (...p) => auth0Client ? auth0Client.logout(...p, {returnTo: hostUrl}) : () => {}
             }
             }
         >
