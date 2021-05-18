@@ -7,7 +7,7 @@ export default class MyApp extends App {
     render() {
         const { Component, pageProps, router } = this.props
 
-        const onRedirectCallback = appState => {
+        const onRedirectCallback = (appState: any) => {
             console.log('appState', appState)
 
             router.push(appState && appState.targetUrl ? appState.targetUrl : '/')
