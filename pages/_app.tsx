@@ -9,9 +9,13 @@ export default class MyApp extends App {
 
         const onRedirectCallback = (appState: any) => {
             console.log('appState', appState)
-
             router.push(appState && appState.targetUrl ? appState.targetUrl : '/')
         }
+
+        const domain = process.env.NEXT_PUBLIC_AUTH0_DOMAIN ?? '';
+        const clientId = process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID ?? '';
+        const hostUrl = process.env.NEXT_PUBLIC_HOST_URL ?? '';
+
 
         return (
             <React.Fragment>
@@ -19,9 +23,9 @@ export default class MyApp extends App {
                     <title>My App</title>
                 </Head>
                 <Auth0Provider
-                    domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN}
-                    clientId={process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID}
-                    redirectUri={process.env.NEXT_PUBLIC_HOST_URL + '/callback' }
+                    domain={domain}
+                    clientId={clientId}
+                    redirectUri={hostUrl + '/callback' }
                     onRedirectCallback={onRedirectCallback}
                 >
                     <Component {...pageProps} router={router} />

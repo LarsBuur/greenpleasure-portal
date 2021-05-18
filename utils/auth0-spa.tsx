@@ -1,5 +1,6 @@
+//@ts-ignore: Object is possibly 'null'.
 import * as React from 'react'
-import createAuth0Client from '@auth0/auth0-spa-js'
+import createAuth0Client, { User } from '@auth0/auth0-spa-js'
 import Auth0Client from "@auth0/auth0-spa-js/dist/typings/Auth0Client"
 import { useRouter } from 'next/router'
 import { NextPage } from 'next'
@@ -17,7 +18,7 @@ interface Auth0ProviderProps {
 
 interface Auth0ContextProps {
     isAuthenticated: boolean
-    user: any
+    user: Partial<User>
     loading: boolean
     popupOpen: boolean
     loginWithPopup: (arg0: any) => any
@@ -29,7 +30,16 @@ interface Auth0ContextProps {
     logout: () => any
 }
 
-export const Auth0Context = React.createContext<Auth0ContextProps>(null)
+export const Auth0Context = React.createContext<Auth0ContextProps>({
+    isAuthenticated: false, user: {}, loading: false, popupOpen: false, 
+    loginWithPopup: ()=>{}, 
+    handleRedirectCallback: ()=>{},
+    getIdTokenClaims: () => { },
+    loginWithRedirect: () => { },
+    getTokenSilently: () => { },
+    getTokenWithPopup: () => { },
+    logout: () => { },
+})
 export const useAuth0 = () => React.useContext(Auth0Context)
 
 export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
@@ -41,7 +51,7 @@ export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
 }) => {
     console.log(`domain: ${domain} clientId: ${clientId} redirectUri: ${redirectUri}`)
     const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false)
-    const [user, setUser] = React.useState()
+    const [user, setUser] = React.useState<Partial<User>>({name: 'not logged in'})
     const [auth0Client, setAuth0] = React.useState<Auth0Client | null>(null)
     const [loading, setLoading] = React.useState(true)
     const [popupOpen, setPopupOpen] = React.useState(false)
@@ -64,13 +74,19 @@ export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
                 onRedirectCallback(appState)
             }
 
-            const isAuthenticated = await auth0FromHook.isAuthenticated()
+            if (auth0FromHook) {
+                const isAuthenticated = await auth0FromHook.isAuthenticated()
 
-            setIsAuthenticated(isAuthenticated)
+                setIsAuthenticated(isAuthenticated)
 
-            if (isAuthenticated) {
-                const user = await auth0FromHook.getUser()
-                setUser(user)
+                if (isAuthenticated) {
+                    const user = await auth0FromHook.getUser();
+                    if (user) {
+                        setUser(user)
+                    }
+
+                }
+
             }
 
             setLoading(false)
@@ -82,24 +98,39 @@ export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
     const loginWithPopup = async (params = {}) => {
         setPopupOpen(true)
         try {
-            await auth0Client.loginWithPopup(params)
+            if (auth0Client) {
+                await auth0Client.loginWithPopup(params)
+            }
+
         } catch (error) {
             console.error(error)
         } finally {
             setPopupOpen(false)
         }
-        const user = await auth0Client.getUser()
-        setUser(user)
-        setIsAuthenticated(true)
+        //@ts-ignore: Object is possibly 'null'.
+        if (auth0Client) {
+            const user = await auth0Client.getUser()
+            if (user) {
+                setUser(user)
+                setIsAuthenticated(true)
+            }
+
+        }
+
+
     }
 
     const handleRedirectCallback = async () => {
-        setLoading(true)
-        await auth0Client.handleRedirectCallback()
-        const user = await auth0Client.getUser()
-        setLoading(false)
-        setIsAuthenticated(true)
-        setUser(user)
+        if (auth0Client) {
+            setLoading(true)
+            await auth0Client.handleRedirectCallback()
+            const user = await auth0Client.getUser()
+            setLoading(false)
+            if (user) {
+                setIsAuthenticated(true)
+                setUser(user)
+            }
+        }
     }
 
     return (
@@ -111,22 +142,19 @@ export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
                 popupOpen,
                 loginWithPopup,
                 handleRedirectCallback,
-                getIdTokenClaims: (...p) => auth0Client.getIdTokenClaims(...p),
-                loginWithRedirect: (...p) => auth0Client.loginWithRedirect(...p),
-                getTokenSilently: (...p) => auth0Client.getTokenSilently(...p),
-                getTokenWithPopup: (...p) => auth0Client.getTokenWithPopup(...p),
-                logout: (...p) => auth0Client.logout(...p)
-            }}
+                getIdTokenClaims: (...p) => auth0Client ? auth0Client.getIdTokenClaims(...p) : () => { },
+                loginWithRedirect: (...p) => auth0Client ? auth0Client.loginWithRedirect(...p) : () => { },
+                getTokenSilently: (...p) => auth0Client ? auth0Client.getTokenSilently(...p) : () => { },
+                getTokenWithPopup: (...p) => auth0Client ? auth0Client.getTokenWithPopup(...p) : () => { },
+                logout: (...p) => auth0Client ? auth0Client.logout(...p) : () => { }
+            }
+            }
         >
-            {children}
-        </Auth0Context.Provider>
+            { children}
+        </Auth0Context.Provider >
     )
 }
 
-
-interface RequireUserProps {
-    children: React.ReactNode
-}
 
 export const requireUser = (
     page: NextPage
