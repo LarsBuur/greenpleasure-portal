@@ -3,7 +3,7 @@ import Layout from '../components/Layout'
 import { useAuth0 } from '../utils/auth0-spa'
 
 const IndexPage = () => {
-  const { isAuthenticated, loginWithRedirect, logout, user, loading } = useAuth0()
+  const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0()
 
   return (
     <Layout title="Home | Next.js + TypeScript Example">
