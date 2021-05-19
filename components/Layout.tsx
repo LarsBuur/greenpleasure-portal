@@ -10,10 +10,8 @@ type Props = {
 
 import {
   CalendarIcon,
-  ChartBarIcon,
   FolderIcon,
   HomeIcon,
-  InboxIcon,
   MenuIcon,
   UsersIcon,
   XIcon,
