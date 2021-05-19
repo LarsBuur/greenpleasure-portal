@@ -39,7 +39,8 @@ export const Auth0Context = React.createContext<Auth0ContextProps>({
     getTokenSilently: () => {},
     getTokenWithPopup: () => {},
     logout: () => {},
-})
+});
+
 export const useAuth0 = () => React.useContext(Auth0Context)
 
 export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
@@ -49,7 +50,7 @@ export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
     clientId,
     redirectUri
 }) => {
-    console.log(`domain: ${domain} clientId: ${clientId} redirectUri: ${redirectUri}`)
+    //console.log(`domain: ${domain} clientId: ${clientId} redirectUri: ${redirectUri}`)
     const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false)
     const [user, setUser] = React.useState<Partial<User>>({})
     const [auth0Client, setAuth0] = React.useState<Auth0Client | null>(null)
@@ -58,7 +59,7 @@ export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
 
     React.useEffect(() => {
 
-        console.log('use effect from auth0-spa')
+        //console.log('use effect from auth0-spa')
 
 
         const initAuth0 = async () => {
@@ -159,7 +160,6 @@ export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
         </Auth0Context.Provider >
     )
 }
-
 
 export const requireUser = (
     page: NextPage
