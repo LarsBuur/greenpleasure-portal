@@ -2,6 +2,8 @@ import React, { ReactNode, Fragment, useState } from 'react'
 import Link from 'next/link'
 import Head from 'next/head'
 import { Dialog, Transition } from '@headlessui/react'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
 
 type Props = {
   children?: ReactNode
@@ -17,9 +19,10 @@ import {
   XIcon,
 } from '@heroicons/react/outline'
 import Profile from '../components/Profile'
+import { useAuth0 } from '../utils/auth0-spa'
 
 const navigation = [
-  { name: 'Home', href: '/', icon: HomeIcon, current: true },
+  { name: 'Home', href: '/', icon: HomeIcon, current: false },
   { name: 'About', href: '/about', icon: UsersIcon, current: false },
   { name: 'users', href: '/users', icon: FolderIcon, current: false },
   { name: 'Users List', href: '/api/users', icon: CalendarIcon, current: false },
@@ -31,6 +34,21 @@ function classNames(...classes: string[]) {
 
 const Layout = ({ children, title = 'This is the default title' }: Props) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const router = useRouter();
+
+  const { isAuthenticated, loginWithRedirect } = useAuth0();
+
+  for (const route of navigation) {
+    if (route.href === router.pathname) {
+      route.current = true;
+    } else {
+      route.current = false;
+    }
+  }
+
+  if (!isAuthenticated) {
+    loginWithRedirect({});
+  }
 
   return (
     <div>
@@ -91,11 +109,8 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
 
                 <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
                   <div className="flex-shrink-0 flex items-center px-4">
-                    <img
-                      className="h-8 w-auto"
-                      src="https://tailwindui.com/img/logos/workflow-logo-indigo-600-mark-gray-800-text.svg"
-                      alt="Workflow"
-                    />
+
+                    <Image className="h-8 w-auto" src="/Logo-02_500x344_400x.png" width={100} height={80} />
                   </div>
                   <nav className="mt-5 px-2 space-y-1">
                     {navigation.map((item) => (
@@ -135,11 +150,8 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
             <div className="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
               <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
                 <div className="flex items-center flex-shrink-0 px-4">
-                  <img
-                    className="h-8 w-auto"
-                    src="https://tailwindui.com/img/logos/workflow-logo-indigo-600-mark-gray-800-text.svg"
-                    alt="Workflow"
-                  />
+                  <Image className="h-8 w-auto" src="/green_pleasure_logo_horizontal.png" width={250} height={36} />
+
                 </div>
                 <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
                   {navigation.map((item) => (
@@ -180,10 +192,10 @@ const Layout = ({ children, title = 'This is the default title' }: Props) => {
           <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
             <div className="py-6">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+                <h1 className="text-2xl font-semibold text-gray-900">{title}</h1>
 
-                            tada
-                        </div>
+
+              </div>
               <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                 {/* Replace with your content */}
                 <div className="py-4">

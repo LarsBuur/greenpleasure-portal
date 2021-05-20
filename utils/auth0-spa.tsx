@@ -71,7 +71,7 @@ export const Auth0Provider: React.FunctionComponent<Auth0ProviderProps> = ({
             })
 
             if (auth0FromHook) {
-                console.log(`auth0fromhook: ${JSON.stringify(auth0FromHook)}`)
+                //console.log(`auth0fromhook: ${JSON.stringify(auth0FromHook)}`)
                 setAuth0(auth0FromHook)
             }
 
